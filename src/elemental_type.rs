@@ -1,27 +1,24 @@
-use crate::primitive_element::PrimitiveElement;
+use crate::primitive_element::Element;
 
 #[derive(Debug, Eq, PartialEq)]
-pub struct ElementalType {
-    primary_primitive_type: PrimitiveElement,
-    secondary_primitive_type: Option<PrimitiveElement>,
+pub struct MonsterElement {
+    primary_primitive_type: Element,
+    secondary_primitive_type: Option<Element>,
 }
 
-impl ElementalType {
-    pub fn new(
-        primary_primitive_type: PrimitiveElement,
-        secondary_primitive_type: Option<PrimitiveElement>,
-    ) -> Self {
-        ElementalType {
+impl MonsterElement {
+    pub fn new(primary_primitive_type: Element, secondary_primitive_type: Option<Element>) -> Self {
+        MonsterElement {
             primary_primitive_type,
             secondary_primitive_type,
         }
     }
 
-    pub fn primary_primitive_type(&self) -> &PrimitiveElement {
+    pub fn primary_primitive_type(&self) -> &Element {
         &self.primary_primitive_type
     }
 
-    pub fn secondary_primitive_type(&self) -> Option<&PrimitiveElement> {
+    pub fn secondary_primitive_type(&self) -> Option<&Element> {
         if let Some(element) = &self.secondary_primitive_type {
             return Some(element);
         }
@@ -37,24 +34,24 @@ mod tests {
 
     #[test]
     fn returns_a_primary_primitive_type() {
-        assert_that(&ElementalType::new(PrimitiveElement::Normal, None).primary_primitive_type())
-            .is_equal_to(&PrimitiveElement::Normal);
+        assert_that(&MonsterElement::new(Element::Normal, None).primary_primitive_type())
+            .is_equal_to(&Element::Normal);
     }
 
     #[test]
     fn returns_present_optional_secondary_primitive_type() {
         assert_that(
-            &ElementalType::new(PrimitiveElement::Normal, Some(PrimitiveElement::Normal))
+            &MonsterElement::new(Element::Normal, Some(Element::Normal))
                 .secondary_primitive_type()
                 .unwrap(),
         )
-        .is_equal_to(&PrimitiveElement::Normal);
+        .is_equal_to(&Element::Normal);
     }
 
     #[test]
     fn returns_missing_optional_secondary_primitive_type() {
         assert_that(
-            &ElementalType::new(PrimitiveElement::Normal, None)
+            &MonsterElement::new(Element::Normal, None)
                 .secondary_primitive_type()
                 .is_none(),
         )

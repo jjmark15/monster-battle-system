@@ -1,5 +1,5 @@
 #[derive(Debug, Eq, PartialEq)]
-pub enum PrimitiveElement {
+pub enum Element {
     Normal,
     Fire,
     Grass,

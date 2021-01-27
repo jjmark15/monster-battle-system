@@ -1,7 +1,7 @@
 use rust_decimal::Decimal;
 
 use crate::type_effectiveness::{DamageMultiplier, TypeEffectivenessCalculator};
-use crate::{ElementalType, PrimitiveElement};
+use crate::{Element, MonsterElement};
 
 #[derive(Default)]
 pub struct TypeEffectivenessCalculatorImpl;
@@ -11,35 +11,29 @@ impl TypeEffectivenessCalculatorImpl {
         TypeEffectivenessCalculatorImpl
     }
 
-    fn primitive_multiplier(
-        attack_type: &PrimitiveElement,
-        defender_type: &PrimitiveElement,
-    ) -> DamageMultiplier {
+    fn primitive_multiplier(attack_type: &Element, defender_type: &Element) -> DamageMultiplier {
         let half = Decimal::new(5, 1);
         let single = 1.into();
         let double = 2.into();
 
         let value: Decimal = match attack_type {
-            PrimitiveElement::Normal => match defender_type {
-                PrimitiveElement::Normal
-                | PrimitiveElement::Fire
-                | PrimitiveElement::Grass
-                | PrimitiveElement::Water => single,
+            Element::Normal => match defender_type {
+                Element::Normal | Element::Fire | Element::Grass | Element::Water => single,
             },
-            PrimitiveElement::Fire => match defender_type {
-                PrimitiveElement::Water | PrimitiveElement::Fire => half,
-                PrimitiveElement::Normal => single,
-                PrimitiveElement::Grass => double,
+            Element::Fire => match defender_type {
+                Element::Water | Element::Fire => half,
+                Element::Normal => single,
+                Element::Grass => double,
             },
-            PrimitiveElement::Grass => match defender_type {
-                PrimitiveElement::Fire | PrimitiveElement::Grass => half,
-                PrimitiveElement::Normal => single,
-                PrimitiveElement::Water => double,
+            Element::Grass => match defender_type {
+                Element::Fire | Element::Grass => half,
+                Element::Normal => single,
+                Element::Water => double,
             },
-            PrimitiveElement::Water => match defender_type {
-                PrimitiveElement::Grass | PrimitiveElement::Water => half,
-                PrimitiveElement::Normal => single,
-                PrimitiveElement::Fire => double,
+            Element::Water => match defender_type {
+                Element::Grass | Element::Water => half,
+                Element::Normal => single,
+                Element::Fire => double,
             },
         };
 
@@ -48,11 +42,7 @@ impl TypeEffectivenessCalculatorImpl {
 }
 
 impl TypeEffectivenessCalculator for TypeEffectivenessCalculatorImpl {
-    fn calculate(
-        &self,
-        attack_type: &PrimitiveElement,
-        defender_type: &ElementalType,
-    ) -> DamageMultiplier {
+    fn calculate(&self, attack_type: &Element, defender_type: &MonsterElement) -> DamageMultiplier {
         let first_multiplier =
             Self::primitive_multiplier(attack_type, defender_type.primary_primitive_type());
 
@@ -79,35 +69,33 @@ mod tests {
     #[test]
     fn normal_has_multiplier_1_against_normal() {
         assert_that(&under_test().calculate(
-            &PrimitiveElement::Normal,
-            &ElementalType::new(PrimitiveElement::Normal, None),
+            &Element::Normal,
+            &MonsterElement::new(Element::Normal, None),
         ))
         .is_equal_to(&DamageMultiplier::new(1.into()));
     }
 
     #[test]
     fn fire_has_multiplier_0_5_against_water() {
-        assert_that(&under_test().calculate(
-            &PrimitiveElement::Fire,
-            &ElementalType::new(PrimitiveElement::Water, None),
-        ))
+        assert_that(
+            &under_test().calculate(&Element::Fire, &MonsterElement::new(Element::Water, None)),
+        )
         .is_equal_to(&DamageMultiplier::new(Decimal::new(5, 1)));
     }
 
     #[test]
     fn grass_has_multiplier_2_against_water() {
-        assert_that(&under_test().calculate(
-            &PrimitiveElement::Grass,
-            &ElementalType::new(PrimitiveElement::Water, None),
-        ))
+        assert_that(
+            &under_test().calculate(&Element::Grass, &MonsterElement::new(Element::Water, None)),
+        )
         .is_equal_to(&DamageMultiplier::new(2.into()));
     }
 
     #[test]
     fn fire_has_multiplier_0_25_against_water_and_fire() {
         assert_that(&under_test().calculate(
-            &PrimitiveElement::Fire,
-            &ElementalType::new(PrimitiveElement::Water, Some(PrimitiveElement::Fire)),
+            &Element::Fire,
+            &MonsterElement::new(Element::Water, Some(Element::Fire)),
         ))
         .is_equal_to(&DamageMultiplier::new(Decimal::new(25, 2)));
     }

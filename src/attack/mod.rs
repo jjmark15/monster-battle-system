@@ -1,20 +1,20 @@
 pub use power::AttackPower;
 
-use crate::PrimitiveElement;
+use crate::Element;
 
 mod power;
 
 pub struct Attack {
-    element: PrimitiveElement,
+    element: Element,
     power: AttackPower,
 }
 
 impl Attack {
-    pub fn new(element: PrimitiveElement, power: AttackPower) -> Self {
+    pub fn new(element: Element, power: AttackPower) -> Self {
         Attack { element, power }
     }
 
-    pub fn element(&self) -> &PrimitiveElement {
+    pub fn element(&self) -> &Element {
         &self.element
     }
 
@@ -30,12 +30,12 @@ mod tests {
     use super::*;
 
     fn under_test() -> Attack {
-        Attack::new(PrimitiveElement::Normal, AttackPower::new(10.into()))
+        Attack::new(Element::Normal, AttackPower::new(10.into()))
     }
 
     #[test]
     fn returns_its_element() {
-        assert_that(&under_test().element()).is_equal_to(&PrimitiveElement::Normal);
+        assert_that(&under_test().element()).is_equal_to(&Element::Normal);
     }
 
     #[test]

@@ -67,11 +67,11 @@ mod tests {
     use spectral::prelude::*;
 
     use crate::type_effectiveness::MockTypeEffectivenessCalculator;
-    use crate::{AttackPower, DamageMultiplier, ElementalType, Health, PrimitiveElement};
+    use crate::{AttackPower, DamageMultiplier, Element, Health, MonsterElement};
 
     use super::*;
 
-    const NON_STAB_ELEMENT: PrimitiveElement = PrimitiveElement::Water;
+    const NON_STAB_ELEMENT: Element = Element::Water;
 
     fn under_test(
         type_effectiveness_calculator: MockTypeEffectivenessCalculator,
@@ -90,19 +90,19 @@ mod tests {
         mock_type_effectiveness_calculator
             .expect_calculate()
             .with(
-                eq(PrimitiveElement::Normal),
-                eq(ElementalType::new(PrimitiveElement::Normal, None)),
+                eq(Element::Normal),
+                eq(MonsterElement::new(Element::Normal, None)),
             )
             .returning(move |_, _| DamageMultiplier::new(multiplier_value));
     }
 
-    fn elemental_type() -> ElementalType {
-        ElementalType::new(PrimitiveElement::Normal, None)
+    fn elemental_type() -> MonsterElement {
+        MonsterElement::new(Element::Normal, None)
     }
 
-    fn attacking_monster(primary_element: PrimitiveElement) -> Monster {
+    fn attacking_monster(primary_element: Element) -> Monster {
         Monster::new(
-            ElementalType::new(primary_element, None),
+            MonsterElement::new(primary_element, None),
             Health::new(10.into()),
         )
     }
@@ -112,7 +112,7 @@ mod tests {
     }
 
     fn attack() -> Attack {
-        Attack::new(PrimitiveElement::Normal, AttackPower::new(5.into()))
+        Attack::new(Element::Normal, AttackPower::new(5.into()))
     }
 
     #[test]
@@ -156,11 +156,7 @@ mod tests {
         prepare_mock_type_effectiveness_calculator(&mut calculator, 1.into());
 
         under_test(calculator)
-            .perform_attack(
-                &attacking_monster(PrimitiveElement::Normal),
-                attack(),
-                &mut defender,
-            )
+            .perform_attack(&attacking_monster(Element::Normal), attack(), &mut defender)
             .unwrap();
 
         assert_that(defender.health()).is_equal_to(&Health::new(Decimal::new(25, 1)));

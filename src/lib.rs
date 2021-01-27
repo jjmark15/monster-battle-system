@@ -1,10 +1,10 @@
 pub use attack::{Attack, AttackPower};
 pub use combat_service::{CombatError, CombatService};
 pub use damage::{Damage, DamageMultiplier};
-pub use elemental_type::ElementalType;
+pub use elemental_type::MonsterElement;
 pub use health::Health;
 pub use monster::Monster;
-pub use primitive_element::PrimitiveElement;
+pub use primitive_element::Element;
 pub use type_effectiveness::{TypeEffectivenessCalculator, TypeEffectivenessCalculatorImpl};
 
 mod attack;
