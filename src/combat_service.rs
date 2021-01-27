@@ -1,3 +1,5 @@
+use rust_decimal::Decimal;
+
 use crate::monster::Monster;
 use crate::type_effectiveness::TypeEffectivenessCalculator;
 use crate::{Attack, Damage, DamageMultiplier};
@@ -14,8 +16,16 @@ impl<TEC: TypeEffectivenessCalculator> CombatService<TEC> {
         }
     }
 
+    fn stab_multiplier(attacker: &Monster, attack: &Attack) -> DamageMultiplier {
+        if attacker.elemental_type().primary_primitive_type() == attack.element() {
+            return DamageMultiplier::new(Decimal::new(15, 1));
+        }
+        DamageMultiplier::new(1.into())
+    }
+
     pub fn perform_attack(
         &self,
+        attacker: &Monster,
         attack: Attack,
         defender: &mut Monster,
     ) -> Result<(), CombatError> {
@@ -23,11 +33,14 @@ impl<TEC: TypeEffectivenessCalculator> CombatService<TEC> {
             return Err(CombatError::DefenderIsAlreadyDefeated);
         }
 
-        let multiplier = self
+        let stab_multiplier = Self::stab_multiplier(attacker, &attack);
+        let type_effectiveness_multiplier = self
             .type_effectiveness_calculator
             .calculate(attack.element(), defender.elemental_type());
+        let combined_damage_multiplier =
+            stab_multiplier.combined_with(type_effectiveness_multiplier);
 
-        let damage = self.damage_from_attack(&attack, multiplier);
+        let damage = self.damage_from_attack(&attack, combined_damage_multiplier);
         defender.receive_damage(damage);
         Ok(())
     }
@@ -58,6 +71,8 @@ mod tests {
 
     use super::*;
 
+    const NON_STAB_ELEMENT: PrimitiveElement = PrimitiveElement::Water;
+
     fn under_test(
         type_effectiveness_calculator: MockTypeEffectivenessCalculator,
     ) -> CombatService<MockTypeEffectivenessCalculator> {
@@ -85,6 +100,13 @@ mod tests {
         ElementalType::new(PrimitiveElement::Normal, None)
     }
 
+    fn attacking_monster(primary_element: PrimitiveElement) -> Monster {
+        Monster::new(
+            ElementalType::new(primary_element, None),
+            Health::new(10.into()),
+        )
+    }
+
     fn defending_monster(health_value: Decimal) -> Monster {
         Monster::new(elemental_type(), Health::new(health_value))
     }
@@ -100,7 +122,11 @@ mod tests {
         prepare_mock_type_effectiveness_calculator(&mut calculator, 1.into());
 
         under_test(calculator)
-            .perform_attack(attack(), &mut defender)
+            .perform_attack(
+                &attacking_monster(NON_STAB_ELEMENT),
+                attack(),
+                &mut defender,
+            )
             .unwrap();
 
         assert_that(defender.health()).is_equal_to(&Health::new(5.into()));
@@ -113,17 +139,41 @@ mod tests {
         prepare_mock_type_effectiveness_calculator(&mut calculator, 2.into());
 
         under_test(calculator)
-            .perform_attack(attack(), &mut defender)
+            .perform_attack(
+                &attacking_monster(NON_STAB_ELEMENT),
+                attack(),
+                &mut defender,
+            )
             .unwrap();
 
         assert_that(defender.health()).is_equal_to(&Health::new(10.into()));
     }
 
     #[test]
+    fn applies_stab_multiplier_bonus_when_attack_type_matches_attacker_primary_type() {
+        let mut defender = defending_monster(10.into());
+        let mut calculator = mock_type_effectiveness_calculator();
+        prepare_mock_type_effectiveness_calculator(&mut calculator, 1.into());
+
+        under_test(calculator)
+            .perform_attack(
+                &attacking_monster(PrimitiveElement::Normal),
+                attack(),
+                &mut defender,
+            )
+            .unwrap();
+
+        assert_that(defender.health()).is_equal_to(&Health::new(Decimal::new(25, 1)));
+    }
+
+    #[test]
     fn fails_to_perform_attack_on_already_defeated_defender() {
         assert_that(&matches!(
-            under_test(mock_type_effectiveness_calculator())
-                .perform_attack(attack(), &mut defending_monster(0.into())),
+            under_test(mock_type_effectiveness_calculator()).perform_attack(
+                &attacking_monster(NON_STAB_ELEMENT),
+                attack(),
+                &mut defending_monster(0.into())
+            ),
             Err(CombatError::DefenderIsAlreadyDefeated)
         ))
         .is_true();
