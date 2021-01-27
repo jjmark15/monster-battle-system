@@ -1,4 +1,10 @@
+use rust_decimal::Decimal;
+
+pub use lame_geek::*;
+
 use crate::{ElementalType, PrimitiveElement};
+
+mod lame_geek;
 
 #[cfg_attr(test, mockall::automock)]
 pub trait TypeEffectivenessCalculator {
@@ -9,18 +15,17 @@ pub trait TypeEffectivenessCalculator {
     ) -> TypeEffectivenessMultiplier;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct TypeEffectivenessMultiplier {
-    value: u16,
+    value: Decimal,
 }
 
 impl TypeEffectivenessMultiplier {
-    #[cfg(test)]
-    pub fn new(value: u16) -> Self {
+    pub fn new(value: Decimal) -> Self {
         TypeEffectivenessMultiplier { value }
     }
 
-    pub fn value(&self) -> u16 {
+    pub fn value(&self) -> Decimal {
         self.value
     }
 }

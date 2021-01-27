@@ -1,12 +1,14 @@
+use rust_decimal::Decimal;
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
-pub struct Health(u16);
+pub struct Health(Decimal);
 
 impl Health {
-    pub fn new(value: u16) -> Self {
+    pub fn new(value: Decimal) -> Self {
         Health(value)
     }
 
-    pub fn value(&self) -> u16 {
+    pub fn value(&self) -> Decimal {
         self.0
     }
 }
@@ -17,10 +19,9 @@ mod tests {
 
     use super::*;
 
-    const HEALTH_VALUE: u16 = 10;
-
     #[test]
     fn returns_integer_value() {
-        assert_that(&Health::new(HEALTH_VALUE).value()).is_equal_to(HEALTH_VALUE);
+        let health_value = Decimal::from(10);
+        assert_that(&Health::new(health_value).value()).is_equal_to(health_value);
     }
 }

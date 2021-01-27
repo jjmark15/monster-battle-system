@@ -25,11 +25,12 @@ impl Attack {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use spectral::prelude::*;
 
+    use super::*;
+
     fn under_test() -> Attack {
-        Attack::new(PrimitiveElement::Normal, AttackPower::new(10))
+        Attack::new(PrimitiveElement::Normal, AttackPower::new(10.into()))
     }
 
     #[test]
@@ -39,6 +40,6 @@ mod tests {
 
     #[test]
     fn returns_its_power() {
-        assert_that(&under_test().power()).is_equal_to(&AttackPower::new(10));
+        assert_that(&under_test().power()).is_equal_to(&AttackPower::new(10.into()));
     }
 }

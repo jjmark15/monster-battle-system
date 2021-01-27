@@ -1,11 +1,13 @@
-pub struct Damage(i16);
+use rust_decimal::Decimal;
+
+pub struct Damage(Decimal);
 
 impl Damage {
-    pub fn new(value: i16) -> Self {
+    pub fn new(value: Decimal) -> Self {
         Damage(value)
     }
 
-    pub fn value(&self) -> i16 {
+    pub fn value(&self) -> Decimal {
         self.0
     }
 }
@@ -16,10 +18,9 @@ mod tests {
 
     use super::*;
 
-    const DAMAGE_VALUE: i16 = 10;
-
     #[test]
     fn returns_integer_value() {
-        assert_that(&Damage::new(DAMAGE_VALUE).value()).is_equal_to(DAMAGE_VALUE);
+        let damage_value = 10.into();
+        assert_that(&Damage::new(damage_value).value()).is_equal_to(damage_value);
     }
 }

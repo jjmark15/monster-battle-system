@@ -5,6 +5,9 @@ pub use elemental_type::ElementalType;
 pub use health::Health;
 pub use monster::Monster;
 pub use primitive_element::PrimitiveElement;
+pub use type_effectiveness::{
+    TypeEffectivenessCalculator, TypeEffectivenessCalculatorImpl, TypeEffectivenessMultiplier,
+};
 
 mod attack;
 mod combat_service;

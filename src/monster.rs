@@ -34,12 +34,12 @@ impl Sub<Damage> for Health {
     type Output = Health;
 
     fn sub(self, rhs: Damage) -> Self::Output {
-        let damage_applied_value = self.value() as i16 - rhs.value();
+        let damage_applied_value = self.value() - rhs.value();
 
-        if damage_applied_value < 0 {
-            Health::new(0)
+        if damage_applied_value < 0.into() {
+            Health::new(0.into())
         } else {
-            Health::new(damage_applied_value as u16)
+            Health::new(damage_applied_value)
         }
     }
 }
@@ -53,7 +53,7 @@ mod tests {
     use super::*;
 
     fn under_test() -> Monster {
-        Monster::new(elemental_type(), Health::new(10))
+        Monster::new(elemental_type(), Health::new(10.into()))
     }
 
     fn elemental_type() -> ElementalType {
@@ -62,7 +62,7 @@ mod tests {
 
     #[test]
     fn returns_its_health() {
-        assert_that(&under_test().health()).is_equal_to(&Health::new(10));
+        assert_that(&under_test().health()).is_equal_to(&Health::new(10.into()));
     }
 
     #[test]
@@ -73,24 +73,24 @@ mod tests {
     #[test]
     fn health_is_affected_by_damage() {
         let mut monster = under_test();
-        monster.receive_damage(Damage::new(5));
+        monster.receive_damage(Damage::new(5.into()));
 
-        assert_that(&monster.health()).is_equal_to(&Health::new(5));
+        assert_that(&monster.health()).is_equal_to(&Health::new(5.into()));
     }
 
     #[test]
     fn damage_cannot_lower_health_below_zero() {
         let mut monster = under_test();
-        monster.receive_damage(Damage::new(15));
+        monster.receive_damage(Damage::new(15.into()));
 
-        assert_that(&monster.health()).is_equal_to(&Health::new(0));
+        assert_that(&monster.health()).is_equal_to(&Health::new(0.into()));
     }
 
     #[test]
     fn negative_damage_adds_to_health() {
         let mut monster = under_test();
-        monster.receive_damage(Damage::new(-5));
+        monster.receive_damage(Damage::new((-5).into()));
 
-        assert_that(&monster.health()).is_equal_to(&Health::new(15));
+        assert_that(&monster.health()).is_equal_to(&Health::new(15.into()));
     }
 }
