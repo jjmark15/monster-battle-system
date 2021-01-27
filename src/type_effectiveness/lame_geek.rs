@@ -1,6 +1,6 @@
 use rust_decimal::Decimal;
 
-use crate::type_effectiveness::{TypeEffectivenessCalculator, TypeEffectivenessMultiplier};
+use crate::type_effectiveness::{DamageMultiplier, TypeEffectivenessCalculator};
 use crate::{ElementalType, PrimitiveElement};
 
 #[derive(Default)]
@@ -14,7 +14,7 @@ impl TypeEffectivenessCalculatorImpl {
     fn primitive_multiplier(
         attack_type: &PrimitiveElement,
         defender_type: &PrimitiveElement,
-    ) -> TypeEffectivenessMultiplier {
+    ) -> DamageMultiplier {
         let half = Decimal::new(5, 1);
         let single = 1.into();
         let double = 2.into();
@@ -43,14 +43,7 @@ impl TypeEffectivenessCalculatorImpl {
             },
         };
 
-        TypeEffectivenessMultiplier::new(value)
-    }
-
-    fn combine_multipliers(
-        first: TypeEffectivenessMultiplier,
-        second: TypeEffectivenessMultiplier,
-    ) -> TypeEffectivenessMultiplier {
-        TypeEffectivenessMultiplier::new(first.value() * second.value())
+        DamageMultiplier::new(value)
     }
 }
 
@@ -59,14 +52,14 @@ impl TypeEffectivenessCalculator for TypeEffectivenessCalculatorImpl {
         &self,
         attack_type: &PrimitiveElement,
         defender_type: &ElementalType,
-    ) -> TypeEffectivenessMultiplier {
+    ) -> DamageMultiplier {
         let first_multiplier =
             Self::primitive_multiplier(attack_type, defender_type.primary_primitive_type());
 
         match defender_type.secondary_primitive_type() {
             Some(element) => {
                 let second_multiplier = Self::primitive_multiplier(attack_type, element);
-                Self::combine_multipliers(first_multiplier, second_multiplier)
+                first_multiplier.combined_with(second_multiplier)
             }
             None => first_multiplier,
         }
@@ -89,7 +82,7 @@ mod tests {
             &PrimitiveElement::Normal,
             &ElementalType::new(PrimitiveElement::Normal, None),
         ))
-        .is_equal_to(&TypeEffectivenessMultiplier::new(1.into()));
+        .is_equal_to(&DamageMultiplier::new(1.into()));
     }
 
     #[test]
@@ -98,7 +91,7 @@ mod tests {
             &PrimitiveElement::Fire,
             &ElementalType::new(PrimitiveElement::Water, None),
         ))
-        .is_equal_to(&TypeEffectivenessMultiplier::new(Decimal::new(5, 1)));
+        .is_equal_to(&DamageMultiplier::new(Decimal::new(5, 1)));
     }
 
     #[test]
@@ -107,7 +100,7 @@ mod tests {
             &PrimitiveElement::Grass,
             &ElementalType::new(PrimitiveElement::Water, None),
         ))
-        .is_equal_to(&TypeEffectivenessMultiplier::new(2.into()));
+        .is_equal_to(&DamageMultiplier::new(2.into()));
     }
 
     #[test]
@@ -116,6 +109,6 @@ mod tests {
             &PrimitiveElement::Fire,
             &ElementalType::new(PrimitiveElement::Water, Some(PrimitiveElement::Fire)),
         ))
-        .is_equal_to(&TypeEffectivenessMultiplier::new(Decimal::new(25, 2)));
+        .is_equal_to(&DamageMultiplier::new(Decimal::new(25, 2)));
     }
 }
