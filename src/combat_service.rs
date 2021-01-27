@@ -1,12 +1,17 @@
 use crate::monster::Monster;
+use crate::type_effectiveness::{TypeEffectivenessCalculator, TypeEffectivenessMultiplier};
 use crate::{Attack, Damage};
 
 #[derive(Default)]
-pub struct CombatService;
+pub struct CombatService<TEC: TypeEffectivenessCalculator> {
+    type_effectiveness_calculator: TEC,
+}
 
-impl CombatService {
-    pub fn new() -> Self {
-        CombatService
+impl<TEC: TypeEffectivenessCalculator> CombatService<TEC> {
+    pub fn new(type_effectiveness_calculator: TEC) -> Self {
+        CombatService {
+            type_effectiveness_calculator,
+        }
     }
 
     pub fn perform_attack(
@@ -18,7 +23,12 @@ impl CombatService {
             return Err(CombatError::DefenderIsAlreadyDefeated);
         }
 
-        let damage = self.damage_from_attack(&attack);
+        dbg!(attack.element(), defender.elemental_type());
+        let multiplier = self
+            .type_effectiveness_calculator
+            .calculate(attack.element(), defender.elemental_type());
+
+        let damage = self.damage_from_attack(&attack, multiplier);
         defender.receive_damage(damage);
         Ok(())
     }
@@ -27,8 +37,12 @@ impl CombatService {
         monster.health().value() == 0
     }
 
-    fn damage_from_attack(&self, attack: &Attack) -> Damage {
-        Damage::new(attack.power().value())
+    fn damage_from_attack(
+        &self,
+        attack: &Attack,
+        multiplier: TypeEffectivenessMultiplier,
+    ) -> Damage {
+        Damage::new(attack.power().value() * multiplier.value() as i16)
     }
 }
 
@@ -40,21 +54,43 @@ pub enum CombatError {
 
 #[cfg(test)]
 mod tests {
+    use mockall::predicate::eq;
     use spectral::prelude::*;
 
+    use crate::type_effectiveness::{MockTypeEffectivenessCalculator, TypeEffectivenessMultiplier};
     use crate::{AttackPower, ElementalType, Health, PrimitiveElement};
 
     use super::*;
 
-    fn under_test() -> CombatService {
-        CombatService::new()
+    fn under_test(
+        type_effectiveness_calculator: MockTypeEffectivenessCalculator,
+    ) -> CombatService<MockTypeEffectivenessCalculator> {
+        CombatService::new(type_effectiveness_calculator)
+    }
+
+    fn mock_type_effectiveness_calculator() -> MockTypeEffectivenessCalculator {
+        MockTypeEffectivenessCalculator::default()
+    }
+
+    fn prepare_mock_type_effectiveness_calculator(
+        mock_type_effectiveness_calculator: &mut MockTypeEffectivenessCalculator,
+        multiplier_value: u16,
+    ) {
+        mock_type_effectiveness_calculator
+            .expect_calculate()
+            .with(
+                eq(PrimitiveElement::Normal),
+                eq(ElementalType::new(PrimitiveElement::Normal, None)),
+            )
+            .returning(move |_, _| TypeEffectivenessMultiplier::new(multiplier_value));
+    }
+
+    fn elemental_type() -> ElementalType {
+        ElementalType::new(PrimitiveElement::Normal, None)
     }
 
     fn defending_monster(health_value: u16) -> Monster {
-        Monster::new(
-            ElementalType::new(PrimitiveElement::Normal, None),
-            Health::new(health_value),
-        )
+        Monster::new(elemental_type(), Health::new(health_value))
     }
 
     fn attack() -> Attack {
@@ -64,8 +100,10 @@ mod tests {
     #[test]
     fn performs_attack_on_defender() {
         let mut defender = defending_monster(10);
+        let mut calculator = mock_type_effectiveness_calculator();
+        prepare_mock_type_effectiveness_calculator(&mut calculator, 1);
 
-        under_test()
+        under_test(calculator)
             .perform_attack(attack(), &mut defender)
             .unwrap();
 
@@ -73,9 +111,23 @@ mod tests {
     }
 
     #[test]
+    fn applies_type_effectiveness_multiplier_to_resultant_damage() {
+        let mut defender = defending_monster(20);
+        let mut calculator = mock_type_effectiveness_calculator();
+        prepare_mock_type_effectiveness_calculator(&mut calculator, 2);
+
+        under_test(calculator)
+            .perform_attack(attack(), &mut defender)
+            .unwrap();
+
+        assert_that(defender.health()).is_equal_to(&Health::new(10));
+    }
+
+    #[test]
     fn fails_to_perform_attack_on_already_defeated_defender() {
         assert_that(&matches!(
-            under_test().perform_attack(attack(), &mut defending_monster(0)),
+            under_test(mock_type_effectiveness_calculator())
+                .perform_attack(attack(), &mut defending_monster(0)),
             Err(CombatError::DefenderIsAlreadyDefeated)
         ))
         .is_true();

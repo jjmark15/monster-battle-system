@@ -13,3 +13,4 @@ mod elemental_type;
 mod health;
 mod monster;
 mod primitive_element;
+mod type_effectiveness;
