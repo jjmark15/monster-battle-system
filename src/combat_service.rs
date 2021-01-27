@@ -23,7 +23,6 @@ impl<TEC: TypeEffectivenessCalculator> CombatService<TEC> {
             return Err(CombatError::DefenderIsAlreadyDefeated);
         }
 
-        dbg!(attack.element(), defender.elemental_type());
         let multiplier = self
             .type_effectiveness_calculator
             .calculate(attack.element(), defender.elemental_type());
