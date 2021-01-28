@@ -1,23 +1,29 @@
 use std::ops::Sub;
 
-use crate::damage::Damage;
-use crate::elemental_type::MonsterElement;
-use crate::health::Health;
+pub use attack::*;
+pub use damage::Damage;
+pub use element::MonsterElements;
+pub use health::Health;
+
+mod attack;
+mod damage;
+mod element;
+mod health;
 
 pub struct Monster {
-    elemental_type: MonsterElement,
+    elemental_type: MonsterElements,
     health: Health,
 }
 
 impl Monster {
-    pub fn new(elemental_type: MonsterElement, health: Health) -> Self {
+    pub fn new(elemental_type: MonsterElements, health: Health) -> Self {
         Monster {
             elemental_type,
             health,
         }
     }
 
-    pub fn elemental_type(&self) -> &MonsterElement {
+    pub fn elemental_type(&self) -> &MonsterElements {
         &self.elemental_type
     }
 
@@ -48,7 +54,7 @@ impl Sub<Damage> for Health {
 mod tests {
     use spectral::prelude::*;
 
-    use crate::primitive_element::Element;
+    use crate::elements::Element;
 
     use super::*;
 
@@ -56,8 +62,8 @@ mod tests {
         Monster::new(elemental_type(), Health::new(10.into()))
     }
 
-    fn elemental_type() -> MonsterElement {
-        MonsterElement::new(Element::Normal, None)
+    fn elemental_type() -> MonsterElements {
+        MonsterElements::new(Element::Normal, None)
     }
 
     #[test]

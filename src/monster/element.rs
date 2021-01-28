@@ -1,14 +1,14 @@
-use crate::primitive_element::Element;
+use crate::elements::Element;
 
 #[derive(Debug, Eq, PartialEq)]
-pub struct MonsterElement {
+pub struct MonsterElements {
     primary_primitive_type: Element,
     secondary_primitive_type: Option<Element>,
 }
 
-impl MonsterElement {
+impl MonsterElements {
     pub fn new(primary_primitive_type: Element, secondary_primitive_type: Option<Element>) -> Self {
-        MonsterElement {
+        MonsterElements {
             primary_primitive_type,
             secondary_primitive_type,
         }
@@ -34,14 +34,14 @@ mod tests {
 
     #[test]
     fn returns_a_primary_primitive_type() {
-        assert_that(&MonsterElement::new(Element::Normal, None).primary_primitive_type())
+        assert_that(&MonsterElements::new(Element::Normal, None).primary_primitive_type())
             .is_equal_to(&Element::Normal);
     }
 
     #[test]
     fn returns_present_optional_secondary_primitive_type() {
         assert_that(
-            &MonsterElement::new(Element::Normal, Some(Element::Normal))
+            &MonsterElements::new(Element::Normal, Some(Element::Normal))
                 .secondary_primitive_type()
                 .unwrap(),
         )
@@ -51,7 +51,7 @@ mod tests {
     #[test]
     fn returns_missing_optional_secondary_primitive_type() {
         assert_that(
-            &MonsterElement::new(Element::Normal, None)
+            &MonsterElements::new(Element::Normal, None)
                 .secondary_primitive_type()
                 .is_none(),
         )

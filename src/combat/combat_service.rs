@@ -1,8 +1,7 @@
 use rust_decimal::Decimal;
 
-use crate::monster::Monster;
-use crate::type_effectiveness::TypeEffectivenessCalculator;
-use crate::{Attack, Damage, DamageMultiplier};
+use crate::combat::{DamageMultiplier, TypeEffectivenessCalculator};
+use crate::monster::{Attack, Damage, Monster};
 
 #[derive(Default)]
 pub struct CombatService<TEC: TypeEffectivenessCalculator> {
@@ -66,8 +65,9 @@ mod tests {
     use rust_decimal::Decimal;
     use spectral::prelude::*;
 
-    use crate::type_effectiveness::MockTypeEffectivenessCalculator;
-    use crate::{AttackPower, DamageMultiplier, Element, Health, MonsterElement};
+    use crate::combat::MockTypeEffectivenessCalculator;
+    use crate::monster::{AttackPower, Health, MonsterElements};
+    use crate::Element;
 
     use super::*;
 
@@ -91,18 +91,18 @@ mod tests {
             .expect_calculate()
             .with(
                 eq(Element::Normal),
-                eq(MonsterElement::new(Element::Normal, None)),
+                eq(MonsterElements::new(Element::Normal, None)),
             )
             .returning(move |_, _| DamageMultiplier::new(multiplier_value));
     }
 
-    fn elemental_type() -> MonsterElement {
-        MonsterElement::new(Element::Normal, None)
+    fn elemental_type() -> MonsterElements {
+        MonsterElements::new(Element::Normal, None)
     }
 
     fn attacking_monster(primary_element: Element) -> Monster {
         Monster::new(
-            MonsterElement::new(primary_element, None),
+            MonsterElements::new(primary_element, None),
             Health::new(10.into()),
         )
     }

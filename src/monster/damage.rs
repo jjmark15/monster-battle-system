@@ -1,6 +1,3 @@
-mod multiplier;
-
-pub use multiplier::DamageMultiplier;
 use rust_decimal::Decimal;
 
 pub struct Damage(Decimal);
