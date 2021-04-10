@@ -16,7 +16,7 @@ impl<TEC: TypeEffectivenessCalculator> CombatService<TEC> {
     }
 
     fn stab_multiplier(attacker: &Monster, attack: &Attack) -> DamageMultiplier {
-        if attacker.elemental_type().primary_primitive_type() == attack.element() {
+        if attacker.monster_type().primary_element() == attack.element() {
             return DamageMultiplier::new(Decimal::new(15, 1));
         }
         DamageMultiplier::new(1.into())
@@ -35,7 +35,7 @@ impl<TEC: TypeEffectivenessCalculator> CombatService<TEC> {
         let stab_multiplier = Self::stab_multiplier(attacker, &attack);
         let type_effectiveness_multiplier = self
             .type_effectiveness_calculator
-            .calculate(attack.element(), defender.elemental_type());
+            .calculate(attack.element(), defender.monster_type());
         let combined_damage_multiplier =
             stab_multiplier.combined_with(type_effectiveness_multiplier);
 
@@ -66,7 +66,7 @@ mod tests {
     use spectral::prelude::*;
 
     use crate::combat::MockTypeEffectivenessCalculator;
-    use crate::monster::{AttackPower, Health, MonsterElements};
+    use crate::monster::{AttackPower, Health, MonsterType};
     use crate::Element;
 
     use super::*;
@@ -91,24 +91,24 @@ mod tests {
             .expect_calculate()
             .with(
                 eq(Element::Normal),
-                eq(MonsterElements::new(Element::Normal, None)),
+                eq(MonsterType::new(Element::Normal, None)),
             )
             .returning(move |_, _| DamageMultiplier::new(multiplier_value));
     }
 
-    fn elemental_type() -> MonsterElements {
-        MonsterElements::new(Element::Normal, None)
+    fn monster_type() -> MonsterType {
+        MonsterType::new(Element::Normal, None)
     }
 
     fn attacking_monster(primary_element: Element) -> Monster {
         Monster::new(
-            MonsterElements::new(primary_element, None),
+            MonsterType::new(primary_element, None),
             Health::new(10.into()),
         )
     }
 
     fn defending_monster(health_value: Decimal) -> Monster {
-        Monster::new(elemental_type(), Health::new(health_value))
+        Monster::new(monster_type(), Health::new(health_value))
     }
 
     fn attack() -> Attack {
@@ -150,7 +150,7 @@ mod tests {
     }
 
     #[test]
-    fn applies_stab_multiplier_bonus_when_attack_type_matches_attacker_primary_type() {
+    fn applies_stab_multiplier_bonus_when_attack_type_matches_attacker_primary_element() {
         let mut defender = defending_monster(10.into());
         let mut calculator = mock_type_effectiveness_calculator();
         prepare_mock_type_effectiveness_calculator(&mut calculator, 1.into());

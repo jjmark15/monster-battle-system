@@ -2,29 +2,29 @@ use std::ops::Sub;
 
 pub use attack::*;
 pub use damage::Damage;
-pub use element::MonsterElements;
 pub use health::Health;
+pub use monster_type::MonsterType;
 
 mod attack;
 mod damage;
-mod element;
 mod health;
+mod monster_type;
 
 pub struct Monster {
-    elemental_type: MonsterElements,
+    monster_type: MonsterType,
     health: Health,
 }
 
 impl Monster {
-    pub fn new(elemental_type: MonsterElements, health: Health) -> Self {
+    pub fn new(monster_type: MonsterType, health: Health) -> Self {
         Monster {
-            elemental_type,
+            monster_type,
             health,
         }
     }
 
-    pub fn elemental_type(&self) -> &MonsterElements {
-        &self.elemental_type
+    pub fn monster_type(&self) -> &MonsterType {
+        &self.monster_type
     }
 
     pub fn receive_damage(&mut self, damage: Damage) {
@@ -59,11 +59,11 @@ mod tests {
     use super::*;
 
     fn under_test() -> Monster {
-        Monster::new(elemental_type(), Health::new(10.into()))
+        Monster::new(monster_type(), Health::new(10.into()))
     }
 
-    fn elemental_type() -> MonsterElements {
-        MonsterElements::new(Element::Normal, None)
+    fn monster_type() -> MonsterType {
+        MonsterType::new(Element::Normal, None)
     }
 
     #[test]
@@ -72,8 +72,8 @@ mod tests {
     }
 
     #[test]
-    fn returns_its_elemental_type() {
-        assert_that(&under_test().elemental_type()).is_equal_to(&elemental_type());
+    fn returns_its_monster_type() {
+        assert_that(&under_test().monster_type()).is_equal_to(&monster_type());
     }
 
     #[test]
