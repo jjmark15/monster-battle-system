@@ -23,7 +23,7 @@ pub(super) fn fire_damage_multiplier(defender_type: &Element) -> PrimitiveDamage
 
 pub(super) fn grass_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
-        Element::Fire | Element::Grass => PrimitiveDamageMultiplier::Half,
+        Element::Fire | Element::Grass | Element::Flying => PrimitiveDamageMultiplier::Half,
         Element::Water => PrimitiveDamageMultiplier::Double,
         _ => PrimitiveDamageMultiplier::Single,
     }
@@ -39,7 +39,15 @@ pub(super) fn water_damage_multiplier(defender_type: &Element) -> PrimitiveDamag
 
 pub(super) fn electric_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
-        Element::Water => PrimitiveDamageMultiplier::Double,
+        Element::Water | Element::Flying => PrimitiveDamageMultiplier::Double,
+        _ => PrimitiveDamageMultiplier::Single,
+    }
+}
+
+pub(super) fn flying_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
+    match defender_type {
+        Element::Grass => PrimitiveDamageMultiplier::Double,
+        Element::Electric => PrimitiveDamageMultiplier::Half,
         _ => PrimitiveDamageMultiplier::Single,
     }
 }
