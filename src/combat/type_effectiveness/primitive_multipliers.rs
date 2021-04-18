@@ -46,8 +46,16 @@ pub(super) fn electric_damage_multiplier(defender_type: &Element) -> PrimitiveDa
 
 pub(super) fn flying_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
-        Element::Grass => PrimitiveDamageMultiplier::Double,
+        Element::Grass | Element::Fighting => PrimitiveDamageMultiplier::Double,
         Element::Electric => PrimitiveDamageMultiplier::Half,
+        _ => PrimitiveDamageMultiplier::Single,
+    }
+}
+
+pub(super) fn fighting_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
+    match defender_type {
+        Element::Normal => PrimitiveDamageMultiplier::Double,
+        Element::Flying => PrimitiveDamageMultiplier::Half,
         _ => PrimitiveDamageMultiplier::Single,
     }
 }
