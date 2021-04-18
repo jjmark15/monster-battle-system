@@ -55,8 +55,11 @@ pub(super) fn grass_damage_multiplier(defender_type: &Element) -> PrimitiveDamag
     }
 }
 
-pub(super) fn normal_damage_multiplier(_defender_type: &Element) -> PrimitiveDamageMultiplier {
-    PrimitiveDamageMultiplier::Single
+pub(super) fn normal_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
+    match defender_type {
+        Element::Fighting => PrimitiveDamageMultiplier::Half,
+        _ => PrimitiveDamageMultiplier::Single,
+    }
 }
 
 pub(super) fn water_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
