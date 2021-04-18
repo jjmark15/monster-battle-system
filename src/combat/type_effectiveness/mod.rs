@@ -21,14 +21,23 @@ impl TypeEffectivenessCalculatorImpl {
 
     fn primitive_multiplier(attack_type: &Element, defender_type: &Element) -> DamageMultiplier {
         match attack_type {
+            Element::Bug => bug_damage_multiplier(defender_type),
             Element::Dark => dark_damage_multiplier(defender_type),
+            Element::Dragon => dragon_damage_multiplier(defender_type),
             Element::Electric => electric_damage_multiplier(defender_type),
+            Element::Fairy => fairy_damage_multiplier(defender_type),
             Element::Fighting => fighting_damage_multiplier(defender_type),
             Element::Fire => fire_damage_multiplier(defender_type),
             Element::Flying => flying_damage_multiplier(defender_type),
+            Element::Ghost => ghost_damage_multiplier(defender_type),
             Element::Grass => grass_damage_multiplier(defender_type),
+            Element::Ground => ground_damage_multiplier(defender_type),
+            Element::Ice => ice_damage_multiplier(defender_type),
             Element::Normal => normal_damage_multiplier(defender_type),
+            Element::Poison => poison_damage_multiplier(defender_type),
             Element::Psychic => psychic_damage_multiplier(defender_type),
+            Element::Rock => rock_damage_multiplier(defender_type),
+            Element::Steel => steel_damage_multiplier(defender_type),
             Element::Water => water_damage_multiplier(defender_type),
         }
         .into()

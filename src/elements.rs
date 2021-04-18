@@ -1,12 +1,21 @@
 #[derive(Debug, Eq, PartialEq)]
 pub enum Element {
+    Bug,
     Dark,
+    Dragon,
     Electric,
+    Fairy,
     Fighting,
     Fire,
     Flying,
+    Ghost,
     Grass,
+    Ground,
+    Ice,
     Normal,
+    Poison,
     Psychic,
+    Rock,
+    Steel,
     Water,
 }
