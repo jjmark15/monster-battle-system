@@ -1,7 +1,8 @@
 #[derive(Debug, Eq, PartialEq)]
 pub enum Element {
-    Normal,
+    Electric,
     Fire,
     Grass,
+    Normal,
     Water,
 }

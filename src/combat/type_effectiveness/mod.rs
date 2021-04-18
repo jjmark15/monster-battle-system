@@ -1,7 +1,4 @@
-use primitive_multipliers::{
-    fire_damage_multiplier, grass_damage_multiplier, normal_damage_multiplier,
-    water_damage_multiplier,
-};
+use primitive_multipliers::*;
 
 use crate::combat::DamageMultiplier;
 use crate::monster::MonsterType;
@@ -24,9 +21,10 @@ impl TypeEffectivenessCalculatorImpl {
 
     fn primitive_multiplier(attack_type: &Element, defender_type: &Element) -> DamageMultiplier {
         match attack_type {
-            Element::Normal => normal_damage_multiplier(defender_type),
+            Element::Electric => electric_damage_multiplier(defender_type),
             Element::Fire => fire_damage_multiplier(defender_type),
             Element::Grass => grass_damage_multiplier(defender_type),
+            Element::Normal => normal_damage_multiplier(defender_type),
             Element::Water => water_damage_multiplier(defender_type),
         }
         .into()
