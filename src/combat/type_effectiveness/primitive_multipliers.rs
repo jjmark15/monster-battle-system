@@ -1,14 +1,5 @@
-use rust_decimal::Decimal;
-
-use crate::combat::DamageMultiplier;
+use crate::combat::damage_multiplier::PrimitiveDamageMultiplier;
 use crate::Element;
-
-pub(super) enum PrimitiveDamageMultiplier {
-    Zero,
-    Half,
-    Single,
-    Double,
-}
 
 pub(super) fn bug_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
@@ -190,17 +181,5 @@ pub(super) fn water_damage_multiplier(defender_type: &Element) -> PrimitiveDamag
         Element::Water | Element::Grass | Element::Dragon => PrimitiveDamageMultiplier::Half,
         Element::Fire | Element::Ground | Element::Rock => PrimitiveDamageMultiplier::Double,
         _ => PrimitiveDamageMultiplier::Single,
-    }
-}
-
-impl From<PrimitiveDamageMultiplier> for DamageMultiplier {
-    fn from(primitive: PrimitiveDamageMultiplier) -> Self {
-        let decimal = match primitive {
-            PrimitiveDamageMultiplier::Zero => 0.into(),
-            PrimitiveDamageMultiplier::Half => Decimal::new(5, 1),
-            PrimitiveDamageMultiplier::Single => 1.into(),
-            PrimitiveDamageMultiplier::Double => 2.into(),
-        };
-        DamageMultiplier::new(decimal)
     }
 }
