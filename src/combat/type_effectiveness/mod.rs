@@ -28,6 +28,7 @@ impl TypeEffectivenessCalculatorImpl {
             Element::Flying => flying_damage_multiplier(defender_type),
             Element::Grass => grass_damage_multiplier(defender_type),
             Element::Normal => normal_damage_multiplier(defender_type),
+            Element::Psychic => psychic_damage_multiplier(defender_type),
             Element::Water => water_damage_multiplier(defender_type),
         }
         .into()

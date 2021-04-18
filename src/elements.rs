@@ -7,5 +7,6 @@ pub enum Element {
     Flying,
     Grass,
     Normal,
+    Psychic,
     Water,
 }

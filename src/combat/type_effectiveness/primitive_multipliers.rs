@@ -12,6 +12,7 @@ pub(super) enum PrimitiveDamageMultiplier {
 pub(super) fn dark_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
         Element::Fighting => PrimitiveDamageMultiplier::Half,
+        Element::Psychic => PrimitiveDamageMultiplier::Double,
         _ => PrimitiveDamageMultiplier::Single,
     }
 }
@@ -26,7 +27,7 @@ pub(super) fn electric_damage_multiplier(defender_type: &Element) -> PrimitiveDa
 pub(super) fn fighting_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
         Element::Normal | Element::Dark => PrimitiveDamageMultiplier::Double,
-        Element::Flying => PrimitiveDamageMultiplier::Half,
+        Element::Flying | Element::Psychic => PrimitiveDamageMultiplier::Half,
         _ => PrimitiveDamageMultiplier::Single,
     }
 }
@@ -58,6 +59,14 @@ pub(super) fn grass_damage_multiplier(defender_type: &Element) -> PrimitiveDamag
 pub(super) fn normal_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
         Element::Fighting => PrimitiveDamageMultiplier::Half,
+        _ => PrimitiveDamageMultiplier::Single,
+    }
+}
+
+pub(super) fn psychic_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
+    match defender_type {
+        Element::Dark => PrimitiveDamageMultiplier::Half,
+        Element::Fighting => PrimitiveDamageMultiplier::Double,
         _ => PrimitiveDamageMultiplier::Single,
     }
 }
