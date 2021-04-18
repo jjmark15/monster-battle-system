@@ -21,6 +21,7 @@ impl TypeEffectivenessCalculatorImpl {
 
     fn primitive_multiplier(attack_type: &Element, defender_type: &Element) -> DamageMultiplier {
         match attack_type {
+            Element::Dark => dark_damage_multiplier(defender_type),
             Element::Electric => electric_damage_multiplier(defender_type),
             Element::Fighting => fighting_damage_multiplier(defender_type),
             Element::Fire => fire_damage_multiplier(defender_type),

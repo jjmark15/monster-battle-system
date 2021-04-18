@@ -9,6 +9,13 @@ pub(super) enum PrimitiveDamageMultiplier {
     Double,
 }
 
+pub(super) fn dark_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
+    match defender_type {
+        Element::Fighting => PrimitiveDamageMultiplier::Half,
+        _ => PrimitiveDamageMultiplier::Single,
+    }
+}
+
 pub(super) fn electric_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
         Element::Water | Element::Flying => PrimitiveDamageMultiplier::Double,
@@ -18,7 +25,7 @@ pub(super) fn electric_damage_multiplier(defender_type: &Element) -> PrimitiveDa
 
 pub(super) fn fighting_damage_multiplier(defender_type: &Element) -> PrimitiveDamageMultiplier {
     match defender_type {
-        Element::Normal => PrimitiveDamageMultiplier::Double,
+        Element::Normal | Element::Dark => PrimitiveDamageMultiplier::Double,
         Element::Flying => PrimitiveDamageMultiplier::Half,
         _ => PrimitiveDamageMultiplier::Single,
     }
